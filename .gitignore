@@ -15,3 +15,6 @@ Device.sv
 c_model/mandelbrot
 c_model/mandelbrot_fixed
 c_model/pic.ppm
+
+c_model/mandelbrot
+c_model/pic.ppm
