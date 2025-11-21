@@ -8,6 +8,7 @@ project
 test_run_dir
 .scalafmt.conf
 build
+*.gtkw
 
 Device.sv
 

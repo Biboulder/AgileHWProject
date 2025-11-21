@@ -6,19 +6,21 @@ package object SYS {
   case class Configuration(
     bufferSize: Int,
     bufferWidth: Int, 
-    sourceCount: Int
+    sourceWidth: Int
   ){
     val busWidth = 8 * bufferWidth
     val maskWidth = bufferWidth
-    val addrWidth = log2Ceil(bufferSize)
+    //val addrWidth = log2Ceil(bufferSize)
+    val addrWidth = 24 
   }
 
   object Configuration {
     def default(): Configuration = {
       Configuration(
         1028, // bufferSize
-        3, // bufferWidth 3 bytes
-        10 // sourceCount
+        307200, // frameSize
+        2, // bufferWidth 2 bytes
+        8 // sourceWidth
       )
     }
   }

@@ -4,6 +4,41 @@ import org.scalatest.flatspec.AnyFlatSpec
 
 class VGATester extends AnyFlatSpec {
   "VGA" should "pass" in {
-    println("HELLO FROM VGA TEST")
+    val clockFrequency = 50000000
+    val config = VGAConfig.vga640x480at60Hz
+    simulate(new VGAController(config, clockFrequency)) { dut =>
+
+      def testHorizontalPeriod(pixels: Int, blank: Boolean, syncPulse: Boolean) = {
+        for (i <- 0 until pixels) {
+          dut.io.horizontalBlank.expect(blank.B)
+          dut.io.horizontalSyncPulse.expect(syncPulse.B)
+          dut.clock.step(clockFrequency / config.pixelFrequency)
+        }
+      }
+
+      def testVerticalPeriod(lines: Int, blank: Boolean, syncPulse: Boolean) = {
+        for (i <- 0 until lines) {
+          dut.io.verticalBlank.expect(blank.B)
+          dut.io.verticalSyncPulse.expect(syncPulse.B)
+          testHorizontalPeriod(config.horizontal.pixels, false, true)
+          testHorizontalPeriod(config.horizontal.frontPorch, true, true)
+          testHorizontalPeriod(config.horizontal.syncPulse, true, false)
+          testHorizontalPeriod(config.horizontal.backPorch, true, true)
+        }
+      }
+
+      testVerticalPeriod(config.vertical.pixels, false, true)
+      testVerticalPeriod(config.vertical.frontPorch, true, true)
+      testVerticalPeriod(config.vertical.syncPulse, true, false)
+      testVerticalPeriod(config.vertical.backPorch, true, true)
+    }
+    // create an image
+    val canvas = new BufferedImage(config.horizontal.pixels, config.vertical.pixels, BufferedImage.TYPE_INT_ARGB)
+    for (i <- 0 until canvas.getWidth()) {
+      for (j <- 0 until canvas.getHeight()) {
+        canvas.setRGB(i, j, 0xFF0000FF)
+      }
+    }
+    javax.imageio.ImageIO.write(canvas, "png", new java.io.File("drawing.png"))
   }
 }
